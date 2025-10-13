@@ -16,12 +16,20 @@ class FortuneFeature(models.Model):
         ('tarot', 'Tarot Reading'),
         ('numerology', 'Numerology'),
         ('palm_reading', 'Palm Reading'),
+        ('foot_reading', 'Foot Reading / طالع بینی فرم پا'),
+        ('istikhara', 'Istikhara / استخاره'),
+        ('ramal', 'Geomancy (Ramal) / رمال'),
     ]
 
     INPUT_TYPES = [
         ('text', 'Text Input'),
         ('image', 'Image Input'),
         ('text_image', 'Text and Image Input'),
+    ]
+
+    SUPPORTED_LANGUAGES = [
+        ('en', 'English'),
+        ('fa', 'Persian (Farsi)'),
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -37,7 +45,7 @@ class FortuneFeature(models.Model):
     # OpenRouter.ai model configuration
     model_name = models.CharField(
         max_length=100,
-        default='openai/gpt-4o-mini',
+        default='google/gemini-2.0-flash-exp:free',
         help_text='OpenRouter.ai model identifier'
     )
     max_tokens = models.IntegerField(default=1000)
@@ -90,6 +98,12 @@ class Reading(models.Model):
         upload_to='readings/%Y/%m/%d/',
         blank=True,
         null=True
+    )
+    language = models.CharField(
+        max_length=5,
+        choices=FortuneFeature.SUPPORTED_LANGUAGES,
+        default='en',
+        help_text='Language for the interpretation'
     )
 
     # Output data

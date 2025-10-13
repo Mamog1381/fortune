@@ -24,7 +24,7 @@ Provide a detailed and engaging fortune reading that includes:
 6. **Guidance**: A meaningful piece of advice or warning
 
 Be creative, mystical, and positive while maintaining an entertaining tone. The reading should feel personal and insightful.''',
-                'model_name': 'openai/gpt-4o-mini',
+                'model_name': 'google/gemini-2.0-flash-exp:free',
                 'max_tokens': 1200,
                 'temperature': 0.8,
                 'credit_cost': 2,
@@ -50,7 +50,7 @@ Analyze this room image and provide comprehensive Feng Shui guidance:
 6. **Long-term Enhancements**: Bigger changes for maximum benefit
 
 Be practical, specific, and encouraging. Focus on creating harmony and positive energy.''',
-                'model_name': 'openai/gpt-4o-mini',
+                'model_name': 'google/gemini-2.0-flash-exp:free',
                 'max_tokens': 1500,
                 'temperature': 0.7,
                 'credit_cost': 2,
@@ -75,7 +75,7 @@ Provide a comprehensive dream interpretation:
 7. **Guidance**: Practical advice based on the dream's message
 
 Be thoughtful, insightful, and respectful. Consider both psychological and mystical interpretations.''',
-                'model_name': 'openai/gpt-4o-mini',
+                'model_name': 'google/gemini-2.0-flash-exp:free',
                 'max_tokens': 1200,
                 'temperature': 0.75,
                 'credit_cost': 1,
@@ -101,7 +101,7 @@ Create a detailed personalized reading based on this birthdate:
 8. **Current Period Guidance**: Insights for the present life phase
 
 Be personalized, positive, and insightful. Help the person understand themselves better.''',
-                'model_name': 'openai/gpt-4o-mini',
+                'model_name': 'google/gemini-2.0-flash-exp:free',
                 'max_tokens': 1400,
                 'temperature': 0.7,
                 'credit_cost': 1,
@@ -134,7 +134,7 @@ Perform a three-card reading (Past-Present-Future spread):
 5. **Reflection**: A question to help deepen the insight
 
 Be mystical, wise, and supportive. Use actual tarot card names and meanings.''',
-                'model_name': 'openai/gpt-4o-mini',
+                'model_name': 'google/gemini-2.0-flash-exp:free',
                 'max_tokens': 1300,
                 'temperature': 0.8,
                 'credit_cost': 1,
@@ -167,7 +167,7 @@ Create a comprehensive numerology reading:
 10. **Guidance**: How to align with your numbers' energy
 
 Be detailed, accurate with numerology calculations, and insightful.''',
-                'model_name': 'openai/gpt-4o-mini',
+                'model_name': 'google/gemini-2.0-flash-exp:free',
                 'max_tokens': 1600,
                 'temperature': 0.7,
                 'credit_cost': 2,
@@ -206,9 +206,155 @@ Analyze this palm image and provide a detailed reading:
 7. **Guidance**: Advice based on palm characteristics
 
 Be detailed, traditional in palmistry knowledge, and encouraging.''',
-                'model_name': 'openai/gpt-4o-mini',
+                'model_name': 'google/gemini-2.0-flash-exp:free',
                 'max_tokens': 1500,
                 'temperature': 0.75,
+                'credit_cost': 2,
+            },
+            {
+                'name': 'Foot Reading / طالع بینی فرم پا',
+                'feature_type': 'foot_reading',
+                'input_type': 'image',
+                'description': 'Upload a clear photo of your foot to receive a detailed reading based on foot shape, lines, and features. / عکس پای خود را آپلود کنید و طالع بینی دقیقی بر اساس شکل، خطوط و ویژگی‌های پا دریافت کنید.',
+                'prompt_template': '''You are an expert in foot reading (podoscopy/solestry) with knowledge of both traditional and mystical interpretations.
+
+Analyze this foot image and provide a comprehensive reading:
+
+1. **Foot Shape & Type**: Identify the overall foot shape and what it reveals about personality
+
+2. **Toe Analysis**:
+   - Big Toe: Leadership, willpower, decision-making
+   - Second Toe: Communication, relationships
+   - Middle Toe: Career, ambition
+   - Fourth Toe: Love, family bonds
+   - Little Toe: Trust, change, adaptability
+
+3. **Sole Lines & Patterns**: Major lines and their meanings
+   - Life line
+   - Heart line
+   - Head line
+   - Fate line
+   - Special markings or patterns
+
+4. **Arch Analysis**: High, medium, or flat arch and its significance
+
+5. **Skin Texture & Color**: What these reveal about health and energy
+
+6. **Personality Insights**:
+   - Natural temperament
+   - Emotional patterns
+   - Decision-making style
+   - Relationship approach
+
+7. **Life Path & Destiny**: What the feet reveal about life journey
+
+8. **Health Indicators**: Physical and energetic wellness signs
+
+9. **Strengths & Talents**: Natural abilities and gifts
+
+10. **Guidance**: Practical advice based on foot characteristics
+
+Be detailed, respectful of this ancient practice, and provide both mystical and practical insights. Reference traditional foot reading wisdom while being supportive and positive.''',
+                'model_name': 'google/gemini-2.0-flash-exp:free',
+                'max_tokens': 1600,
+                'temperature': 0.75,
+                'credit_cost': 2,
+            },
+            {
+                'name': 'Istikhara / استخاره',
+                'feature_type': 'istikhara',
+                'input_type': 'text',
+                'description': 'Seek divine guidance through spiritual consultation. Share your question or dilemma. / راهنمایی الهی را از طریق مشاوره معنوی دریافت کنید. سوال یا معضل خود را مطرح کنید.',
+                'prompt_template': '''You are a wise spiritual advisor with deep understanding of Istikhara (seeking divine guidance) and spiritual consultation practices.
+
+The seeker asks: {user_input}
+
+Provide a thoughtful spiritual guidance response:
+
+1. **Understanding the Question**: Reflect on the core of what is being asked
+
+2. **Spiritual Perspective**: View the situation through a lens of higher wisdom and divine guidance
+
+3. **Signs & Intuition**: What spiritual signs or intuitive insights emerge regarding this matter?
+
+4. **Path Analysis**:
+   - Potential positive outcomes
+   - Possible challenges or lessons
+   - Hidden blessings in each direction
+
+5. **Heart Wisdom**: What does the heart truly know about this situation?
+
+6. **Practical Spiritual Advice**:
+   - Prayers or contemplation practices
+   - Actions to take while seeking clarity
+   - How to recognize divine guidance
+
+7. **Inner Peace Guidance**: Steps to find tranquility regardless of outcome
+
+8. **Trust & Surrender**: Wisdom about trusting the process and divine timing
+
+9. **Reflection Questions**: Questions to help the seeker connect with their inner wisdom
+
+10. **Final Guidance**: A message of hope, faith, and divine support
+
+Be respectful of Islamic traditions and spiritual practices. Emphasize connection with the divine, inner wisdom, and trust in divine timing. Be compassionate, wise, and supportive without making definitive predictions.''',
+                'model_name': 'google/gemini-2.0-flash-exp:free',
+                'max_tokens': 1400,
+                'temperature': 0.75,
+                'credit_cost': 1,
+            },
+            {
+                'name': 'Geomancy (Ramal) / رمال',
+                'feature_type': 'ramal',
+                'input_type': 'text',
+                'description': 'Receive mystical insights through the ancient art of Ramal (geomancy). Share your question for a detailed reading. / از طریق هنر کهن رمال، بینش‌های عرفانی دریافت کنید. سوال خود را برای فال دقیق مطرح کنید.',
+                'prompt_template': '''You are a master of Ramal (geomancy), an ancient divination system using patterns and symbols to reveal hidden knowledge.
+
+Question asked: {user_input}
+
+Perform a complete Ramal reading:
+
+1. **Generating the Geomantic Figures**:
+   - Cast four Mother figures based on the question's energy
+   - List the figures using traditional names (Laetitia, Fortuna Major, Puella, etc.)
+   - Show the patterns (dots/lines representation)
+
+2. **The Geomantic Shield**:
+   - Mother figures (4)
+   - Daughter figures (4)
+   - Niece figures (4)
+   - Witness figures (2)
+   - Judge figure (1)
+
+3. **Figure Meanings**:
+   - Explain each significant figure's traditional meaning
+   - Elemental associations (Earth, Air, Fire, Water)
+   - Planetary rulers
+
+4. **Question Analysis Through Houses**:
+   - Relevant astrological houses for this question
+   - Figures appearing in key houses
+   - Interactions between figures
+
+5. **Time Frame**: When the answer or outcome may manifest
+
+6. **Obstacles & Opportunities**: What the figures reveal about challenges and favorable conditions
+
+7. **Overall Reading**:
+   - Direct answer to the question
+   - Additional insights the figures reveal
+   - Hidden factors at play
+
+8. **Practical Guidance**: Actions to take based on the reading
+
+9. **Spiritual Message**: Deeper wisdom from the geomantic pattern
+
+10. **Final Counsel**: Summary and advice
+
+Be authentic to traditional Ramal/geomancy practices. Use proper geomantic figure names and meanings. Be mystical yet clear, providing both esoteric wisdom and practical guidance.''',
+                'model_name': 'google/gemini-2.0-flash-exp:free',
+                'max_tokens': 1800,
+                'temperature': 0.8,
                 'credit_cost': 2,
             },
         ]

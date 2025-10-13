@@ -12,7 +12,7 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-this-in-produc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',') if not DEBUG else ['*']
 
 # Application definition
 INSTALLED_APPS = [
@@ -171,7 +171,8 @@ CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
 
 # CORS Settings
-CORS_ALLOW_ALL_ORIGINS = True  # Change this in production
+CORS_ALLOW_ALL_ORIGINS = config('CORS_ALLOW_ALL_ORIGINS', default=True, cast=bool)
+CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='').split(',') if config('CORS_ALLOWED_ORIGINS', default='') else []
 CORS_ALLOW_CREDENTIALS = True
 
 # OTP Settings
@@ -181,8 +182,27 @@ MAX_OTP_ATTEMPTS = config('MAX_OTP_ATTEMPTS', default=5, cast=int)
 OTP_BLOCK_DURATION = config('OTP_BLOCK_DURATION', default=3600, cast=int)
 
 # SMS Provider Settings
+SMS_PROVIDER = config('SMS_PROVIDER', default='faraz')
+
+# Faraz SMS Configuration (https://farazsms.com)
+FARAZ_API_KEY = config('FARAZ_API_KEY', default='')
+FARAZ_ORIGINATOR = config('FARAZ_ORIGINATOR', default='')  # Your 10-digit originator number
+FARAZ_PATTERN_CODE = config('FARAZ_PATTERN_CODE', default='')  # Pattern code for OTP
+
+# Legacy SMS settings (for backward compatibility)
 SMS_API_KEY = config('SMS_API_KEY', default='')
 SMS_API_URL = config('SMS_API_URL', default='')
 
 # OpenRouter.ai Settings
 OPENROUTER_API_KEY = config('OPENROUTER_API_KEY', default='')
+
+# Security Settings (for production HTTPS)
+if not DEBUG:
+    SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=True, cast=bool)
+    SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', default=True, cast=bool)
+    CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', default=True, cast=bool)
+    SECURE_BROWSER_XSS_FILTER = config('SECURE_BROWSER_XSS_FILTER', default=True, cast=bool)
+    SECURE_CONTENT_TYPE_NOSNIFF = config('SECURE_CONTENT_TYPE_NOSNIFF', default=True, cast=bool)
+    SECURE_HSTS_SECONDS = config('SECURE_HSTS_SECONDS', default=31536000, cast=int)
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = config('SECURE_HSTS_INCLUDE_SUBDOMAINS', default=True, cast=bool)
+    SECURE_HSTS_PRELOAD = config('SECURE_HSTS_PRELOAD', default=True, cast=bool)

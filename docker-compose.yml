@@ -32,14 +32,17 @@ services:
     command: gunicorn --bind 0.0.0.0:8000 --workers 3 config.wsgi:application
     volumes:
       - .:/app
-    ports:
-      - "8000:8000"
+      - ./staticfiles:/app/staticfiles
+      - ./media:/app/media
+    expose:
+      - "8000"
     environment:
       - DEBUG=True
       - SECRET_KEY=your-secret-key-change-in-production
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/coffee_fortune_db
       - REDIS_URL=redis://redis:6379/0
       - CELERY_BROKER_URL=redis://redis:6379/1
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
     depends_on:
       db:
         condition: service_healthy
@@ -57,6 +60,7 @@ services:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/coffee_fortune_db
       - REDIS_URL=redis://redis:6379/0
       - CELERY_BROKER_URL=redis://redis:6379/1
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
     depends_on:
       db:
         condition: service_healthy
@@ -74,11 +78,29 @@ services:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/coffee_fortune_db
       - REDIS_URL=redis://redis:6379/0
       - CELERY_BROKER_URL=redis://redis:6379/1
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./staticfiles:/app/staticfiles
+      - ./media:/app/media
+      # Uncomment for SSL certificates
+      # - ./certbot/conf:/etc/letsencrypt
+      # - ./certbot/www:/var/www/certbot
+    depends_on:
+      - web
+    restart: unless-stopped
 
 volumes:
   postgres_data:

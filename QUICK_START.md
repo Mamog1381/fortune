@@ -1,76 +1,113 @@
-# Quick Start Guide
+# Quick Start Guide - Persian Support Enabled 🇮🇷
 
-## Start Server (5 minutes)
+## 🚀 Start Server in 2 Steps
 
+### Step 1: Run Setup Script
 ```bash
-# 1. Start services
-docker-compose up -d --build
+setup.bat
+```
+This automatically:
+- ✅ Checks Docker
+- ✅ Creates `.env` file
+- ✅ Builds images
+- ✅ Starts services
+- ✅ Runs migrations
 
-# 2. Initialize database
-docker-compose exec web python manage.py migrate
-
-# 3. Load fortune features
+### Step 2: Load Features
+```bash
 docker-compose exec web python manage.py populate_features
-
-# 4. Check status
-docker-compose exec web python manage.py check_api_status
 ```
 
 ✅ **Server running at:** http://localhost:8000
 
 ---
 
-## Test API
+## 🎯 Test Persian Language API
 
 ### 1. Get OTP
 ```bash
-curl -X POST http://localhost:8000/api/auth/send-otp/ \
+curl -X POST http://localhost:8000/api/accounts/request-otp/ \
   -H "Content-Type: application/json" \
-  -d '{"phone_number": "+1234567890"}'
+  -d '{"phone_number": "+989123456789"}'
 ```
 
 ### 2. Check OTP in logs
 ```bash
-docker-compose logs -f celery
-# Find: [DEBUG MODE] OTP for +1234567890: 123456
+docker-compose logs celery | findstr OTP
+# Find: [DEBUG MODE] OTP for +989123456789: 123456
 ```
 
 ### 3. Verify OTP & Get Token
 ```bash
-curl -X POST http://localhost:8000/api/auth/verify/ \
+curl -X POST http://localhost:8000/api/accounts/verify-otp/ \
   -H "Content-Type: application/json" \
-  -d '{"phone_number": "+1234567890", "otp_code": "123456"}'
+  -d '{"phone_number": "+989123456789", "otp": "123456"}'
 ```
 
 **Save the access token!**
 
-### 4. List Fortune Features
-```bash
-curl -X GET http://localhost:8000/api/fortune/features/ \
-  -H "Authorization: Bearer YOUR_TOKEN"
-```
-
-### 5. Create Reading (Text)
+### 4. Create Reading in Persian 🇮🇷
 ```bash
 curl -X POST http://localhost:8000/api/fortune/readings/ \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "feature_type": "dream_interpretation",
+    "language": "fa",
+    "text_input": "خواب دیدم که پرنده‌ای سفید پرواز می‌کند"
+  }'
+```
+
+### 5. Create Reading in English
+```bash
+curl -X POST http://localhost:8000/api/fortune/readings/ \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "feature_type": "dream_interpretation",
+    "language": "en",
     "text_input": "I dreamed about flying"
   }'
 ```
 
 ### 6. Check Reading Result
 ```bash
-# Wait 3-5 seconds, then:
-curl -X GET http://localhost:8000/api/fortune/readings/READING_ID/status_check/ \
+# Wait 5-10 seconds, then:
+curl -X GET http://localhost:8000/api/fortune/readings/READING_ID/ \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
 ---
 
-## Common Commands
+## 🌐 Language Support
+
+### Supported Languages
+- `"en"` - English (default)
+- `"fa"` - Persian (Farsi) 🇮🇷
+
+### Usage
+Add `"language": "fa"` to any reading request:
+```json
+{
+  "feature_type": "tarot",
+  "language": "fa",
+  "text_input": "سوال من درباره آینده است"
+}
+```
+
+**Response will be in Persian:**
+```json
+{
+  "id": "...",
+  "language": "fa",
+  "interpretation": "تفسیر به زبان فارسی...",
+  "status": "completed"
+}
+```
+
+---
+
+## 🔧 Common Commands
 
 ```bash
 # View logs
@@ -80,7 +117,7 @@ docker-compose logs -f
 docker-compose down
 
 # Restart service
-docker-compose restart web
+docker-compose restart web celery
 
 # Create admin user
 docker-compose exec web python manage.py createsuperuser
@@ -91,40 +128,54 @@ docker-compose exec web python manage.py shell
 
 ---
 
-## Available Features
+## 🎴 Available Features
 
-| Feature | Type | Input |
-|---------|------|-------|
-| Coffee Fortune | `coffee_fortune` | Image |
-| Feng Shui | `feng_shui` | Image |
-| Dream Interpretation | `dream_interpretation` | Text |
-| Birthdate Horoscope | `birthdate_horoscope` | Text |
-| Tarot Reading | `tarot` | Text |
-| Numerology | `numerology` | Text |
-| Palm Reading | `palm_reading` | Image |
+All features support both English and Persian!
+
+| Feature | Type | Input | Persian Ready |
+|---------|------|-------|---------------|
+| Coffee Fortune | `coffee_fortune` | Image | ✅ |
+| Feng Shui | `feng_shui` | Image | ✅ |
+| Dream Interpretation | `dream_interpretation` | Text | ✅ |
+| Birthdate Horoscope | `birthdate_horoscope` | Text | ✅ |
+| Tarot Reading | `tarot` | Text | ✅ |
+| Numerology | `numerology` | Text | ✅ |
+| Palm Reading | `palm_reading` | Image | ✅ |
 
 ---
 
-## URLs
+## 🔗 URLs
 
 - **API Base:** http://localhost:8000/api
 - **Admin Panel:** http://localhost:8000/admin
-- **Auth Endpoints:** http://localhost:8000/api/auth/
+- **Auth Endpoints:** http://localhost:8000/api/accounts/
 - **Fortune Endpoints:** http://localhost:8000/api/fortune/
 
 ---
 
-## Add OpenRouter API Key
+## 🤖 AI Model Configuration
 
-1. Get key: https://openrouter.ai/keys
-2. Edit `.env` file: `OPENROUTER_API_KEY=your-key-here`
-3. Restart: `docker-compose restart web celery`
+**Current Model:** `google/gemini-2.0-flash-exp:free`
+**Provider:** OpenRouter.ai
+**API Key:** ✅ Already configured in `.env`
 
-**Without key:** System runs in MOCK MODE (perfect for testing!)
+The Gemini 2.0 Flash model provides:
+- ✅ Native Persian language support
+- ✅ Cultural context understanding
+- ✅ Free tier (via OpenRouter)
+- ✅ Fast response times
 
 ---
 
-## Troubleshooting
+## 📚 Documentation
+
+- **Persian API Guide:** [PERSIAN_API_GUIDE.md](PERSIAN_API_GUIDE.md) - Bilingual guide
+- **Full Deployment:** [DEPLOYMENT.md](DEPLOYMENT.md) - Complete setup instructions
+- **Changes Summary:** [CHANGES_SUMMARY.md](CHANGES_SUMMARY.md) - What's new
+
+---
+
+## ❓ Troubleshooting
 
 **Problem:** Database error
 ```bash
@@ -143,11 +194,27 @@ docker-compose logs celery
 docker-compose exec web python manage.py populate_features
 ```
 
+**Problem:** Persian text shows as ???
+- Your terminal/client needs UTF-8 support
+- Use Postman or Insomnia for testing
+
 ---
 
-## Full Documentation
+## ✅ What's Configured
 
-- 📖 [Deployment Guide](DEPLOYMENT_GUIDE.md)
-- 🔐 [Auth API](API_DOCUMENTATION.md)
-- 🔮 [Fortune API](FORTUNE_API_DOCUMENTATION.md)
-- 📝 [Main README](README.md)
+- ✅ Google Gemini 2.0 Flash model
+- ✅ OpenRouter API key
+- ✅ Persian (Farsi) language support
+- ✅ Docker environment
+- ✅ PostgreSQL database
+- ✅ Redis cache
+- ✅ Celery background tasks
+- ✅ All 7 fortune-telling features
+
+## 🎉 You're Ready!
+
+Start making fortune predictions in **English** and **Persian**!
+
+---
+
+Made with ❤️ for Persian users | ساخته شده با ❤️ برای کاربران فارسی

@@ -30,6 +30,14 @@ def process_reading(self, reading_id: str):
         # Prepare the prompt
         prompt = reading.feature.prompt_template
 
+        # Add language instruction to prompt
+        language_instructions = {
+            'fa': '\n\nIMPORTANT: Please provide your response in Persian (Farsi) language. Use Persian script and maintain cultural sensitivity for Iranian/Persian traditions.',
+            'en': ''
+        }
+        language_instruction = language_instructions.get(reading.language, '')
+        prompt = prompt + language_instruction
+
         # Replace placeholders
         if reading.text_input:
             prompt = prompt.replace('{user_input}', reading.text_input)

@@ -25,7 +25,7 @@ class OpenRouterService:
     def _make_request(
         self,
         messages: list,
-        model: str = "openai/gpt-4o-mini",
+        model: str = "google/gemini-2.0-flash-exp:free",
         max_tokens: int = 1000,
         temperature: float = 0.7,
     ) -> Dict[str, Any]:
@@ -82,7 +82,7 @@ class OpenRouterService:
     def generate_text_interpretation(
         self,
         prompt: str,
-        model: str = "openai/gpt-4o-mini",
+        model: str = "google/gemini-2.0-flash-exp:free",
         max_tokens: int = 1000,
         temperature: float = 0.7,
     ) -> Dict[str, Any]:
@@ -106,7 +106,7 @@ class OpenRouterService:
         self,
         prompt: str,
         image_url: str,
-        model: str = "openai/gpt-4o-mini",
+        model: str = "google/gemini-2.0-flash-exp:free",
         max_tokens: int = 1000,
         temperature: float = 0.7,
     ) -> Dict[str, Any]:

@@ -26,6 +26,11 @@ class ReadingCreateSerializer(serializers.ModelSerializer):
     Serializer for creating a new reading.
     """
     feature_type = serializers.CharField(write_only=True)
+    language = serializers.ChoiceField(
+        choices=[('en', 'English'), ('fa', 'Persian')],
+        default='en',
+        required=False
+    )
 
     class Meta:
         model = Reading
@@ -34,6 +39,7 @@ class ReadingCreateSerializer(serializers.ModelSerializer):
             'feature_type',
             'text_input',
             'image',
+            'language',
             'status',
             'created_at',
         ]
@@ -108,6 +114,7 @@ class ReadingSerializer(serializers.ModelSerializer):
             'feature',
             'text_input',
             'image',
+            'language',
             'interpretation',
             'status',
             'error_message',
