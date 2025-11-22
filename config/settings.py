@@ -134,6 +134,16 @@ SPECTACULAR_SETTINGS = {
     'SERVE_INCLUDE_SCHEMA': False,
     'COMPONENT_SPLIT_REQUEST': True,
     'SCHEMA_PATH_PREFIX': '/api/',
+    'SERVERS': [
+        {'url': 'http://82.115.13.19:8085', 'description': 'Production server'},
+        {'url': 'http://localhost:8085', 'description': 'Local development server'},
+    ],
+    # Disable COOP header for HTTP deployments
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'persistAuthorization': True,
+        'displayOperationId': True,
+    },
 }
 
 # Simple JWT
@@ -191,6 +201,8 @@ CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8085',
     'http://127.0.0.1:8085',
+    'http://82.115.13.19:8085',
+    'http://82.115.13.19',
 ]
 
 # OTP Settings
