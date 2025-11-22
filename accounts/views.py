@@ -28,7 +28,8 @@ logger = logging.getLogger(__name__)
                     value={
                         'message': 'OTP sent successfully',
                         'phone_number': '+1234567890',
-                        'expires_in': 120
+                        'expires_in': 120 ,
+                        'otp' : '123456'
                     }
                 )
             ]
