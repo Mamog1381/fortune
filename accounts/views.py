@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.conf import settings
 from django.utils.crypto import get_random_string
+from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiExample
 
 from .models import User
 from .serializers import SendOTPSerializer, VerifyOTPSerializer, UserSerializer
@@ -16,6 +17,29 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+@extend_schema(
+    request=SendOTPSerializer,
+    responses={
+        200: OpenApiResponse(
+            description='OTP sent successfully',
+            examples=[
+                OpenApiExample(
+                    'Success Response',
+                    value={
+                        'message': 'OTP sent successfully',
+                        'phone_number': '+1234567890',
+                        'expires_in': 120
+                    }
+                )
+            ]
+        ),
+        400: OpenApiResponse(description='Invalid phone number or validation error'),
+        429: OpenApiResponse(description='Rate limit exceeded'),
+    },
+    summary='Send OTP',
+    description='Send a one-time password (OTP) to the provided phone number via SMS',
+    tags=['Authentication']
+)
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def send_otp(request):
@@ -83,6 +107,39 @@ def send_otp(request):
     )
 
 
+@extend_schema(
+    request=VerifyOTPSerializer,
+    responses={
+        200: OpenApiResponse(
+            description='OTP verified successfully',
+            examples=[
+                OpenApiExample(
+                    'Success Response',
+                    value={
+                        'message': 'Authentication successful',
+                        'user': {
+                            'id': 1,
+                            'phone_number': '+1234567890',
+                            'first_name': '',
+                            'last_name': '',
+                            'date_joined': '2025-11-22T10:00:00Z',
+                            'last_login': '2025-11-22T10:00:00Z'
+                        },
+                        'tokens': {
+                            'refresh': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...',
+                            'access': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...'
+                        }
+                    }
+                )
+            ]
+        ),
+        400: OpenApiResponse(description='Invalid OTP or validation error'),
+        429: OpenApiResponse(description='Too many failed attempts'),
+    },
+    summary='Verify OTP',
+    description='Verify the OTP code and authenticate the user, returning JWT access and refresh tokens',
+    tags=['Authentication']
+)
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def verify_otp(request):

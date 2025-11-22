@@ -6,6 +6,8 @@ from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django.shortcuts import get_object_or_404
 from django.db import models
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiExample
+from drf_spectacular.types import OpenApiTypes
 
 from .models import FortuneFeature, Reading, ReadingHistory
 from .serializers import (
@@ -19,6 +21,18 @@ from .tasks import process_reading
 from .services import ImageAnalyzer
 
 
+@extend_schema_view(
+    list=extend_schema(
+        summary='List all fortune features',
+        description='Get a list of all available fortune reading features',
+        tags=['Fortune Features']
+    ),
+    retrieve=extend_schema(
+        summary='Get fortune feature details',
+        description='Get detailed information about a specific fortune feature',
+        tags=['Fortune Features']
+    ),
+)
 class FortuneFeatureViewSet(viewsets.ReadOnlyModelViewSet):
     """
     ViewSet for listing available fortune features.
@@ -27,6 +41,20 @@ class FortuneFeatureViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = FortuneFeatureSerializer
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='type',
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                description='Feature type (e.g., coffee_fortune, tarot, palm_reading)',
+                required=True
+            )
+        ],
+        summary='Get feature by type',
+        description='Retrieve a specific fortune feature by its type',
+        tags=['Fortune Features']
+    )
     @action(detail=False, methods=['get'])
     def by_type(self, request):
         """
@@ -54,6 +82,40 @@ class FortuneFeatureViewSet(viewsets.ReadOnlyModelViewSet):
             )
 
 
+@extend_schema_view(
+    list=extend_schema(
+        summary='List user readings',
+        description='Get a list of all readings for the authenticated user',
+        tags=['Readings']
+    ),
+    retrieve=extend_schema(
+        summary='Get reading details',
+        description='Get detailed information about a specific reading',
+        tags=['Readings']
+    ),
+    create=extend_schema(
+        summary='Create a new reading',
+        description='Create a new fortune reading with an optional image. The reading will be processed asynchronously.',
+        request=ReadingCreateSerializer,
+        responses={201: ReadingSerializer},
+        tags=['Readings']
+    ),
+    update=extend_schema(
+        summary='Update reading',
+        description='Update a reading',
+        tags=['Readings']
+    ),
+    partial_update=extend_schema(
+        summary='Partially update reading',
+        description='Partially update a reading',
+        tags=['Readings']
+    ),
+    destroy=extend_schema(
+        summary='Delete reading',
+        description='Delete a reading',
+        tags=['Readings']
+    ),
+)
 class ReadingViewSet(viewsets.ModelViewSet):
     """
     ViewSet for managing fortune readings.
@@ -68,6 +130,8 @@ class ReadingViewSet(viewsets.ModelViewSet):
         """
         Return readings for the current user only.
         """
+        if getattr(self, 'swagger_fake_view', False):
+            return Reading.objects.none()
         return Reading.objects.filter(user=self.request.user).select_related('feature')
 
     def get_serializer_class(self):
@@ -108,6 +172,11 @@ class ReadingViewSet(viewsets.ModelViewSet):
             status=status.HTTP_201_CREATED
         )
 
+    @extend_schema(
+        summary='Check reading status',
+        description='Check the processing status of a specific reading',
+        tags=['Readings']
+    )
     @action(detail=True, methods=['get'])
     def status_check(self, request, pk=None):
         """
@@ -117,6 +186,12 @@ class ReadingViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(reading)
         return Response(serializer.data)
 
+    @extend_schema(
+        request=ReadingFeedbackSerializer,
+        summary='Submit reading feedback',
+        description='Submit rating and feedback for a completed reading',
+        tags=['Readings']
+    )
     @action(detail=True, methods=['post'])
     def feedback(self, request, pk=None):
         """
@@ -154,6 +229,20 @@ class ReadingViewSet(viewsets.ModelViewSet):
             'rating': history.rating
         })
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='limit',
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
+                description='Number of recent readings to return (default: 10)',
+                required=False
+            )
+        ],
+        summary='Get recent readings',
+        description='Get the most recent readings for the authenticated user',
+        tags=['Readings']
+    )
     @action(detail=False, methods=['get'])
     def recent(self, request):
         """
@@ -165,6 +254,18 @@ class ReadingViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
+@extend_schema_view(
+    list=extend_schema(
+        summary='List reading history',
+        description='Get the reading history for the authenticated user',
+        tags=['Reading History']
+    ),
+    retrieve=extend_schema(
+        summary='Get history details',
+        description='Get detailed information about a specific history entry',
+        tags=['Reading History']
+    ),
+)
 class ReadingHistoryViewSet(viewsets.ReadOnlyModelViewSet):
     """
     ViewSet for viewing reading history.
@@ -178,10 +279,17 @@ class ReadingHistoryViewSet(viewsets.ReadOnlyModelViewSet):
         """
         Return history for the current user only.
         """
+        if getattr(self, 'swagger_fake_view', False):
+            return ReadingHistory.objects.none()
         return ReadingHistory.objects.filter(
             user=self.request.user
         ).select_related('feature', 'reading')
 
+    @extend_schema(
+        summary='Get reading statistics',
+        description='Get statistical information about the user\'s reading history',
+        tags=['Reading History']
+    )
     @action(detail=False, methods=['get'])
     def statistics(self, request):
         """

@@ -1,3 +1,7 @@
+# Production Docker Compose Configuration
+# Use this file for VPS deployment
+# Usage: docker-compose -f docker-compose.prod.yml up -d
+
 version: '3.8'
 
 services:
@@ -8,99 +12,104 @@ services:
     environment:
       - POSTGRES_DB=coffee_fortune_db
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    ports:
-      - "5432:5432"
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    restart: unless-stopped
+    env_file:
+      - .env
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
+    # Only expose on localhost, not publicly
+    ports:
+      - "127.0.0.1:5432:5432"
 
   redis:
     image: redis:7-alpine
-    ports:
-      - "6379:6379"
+    command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
+    # Only expose on localhost
+    ports:
+      - "127.0.0.1:6379:6379"
 
   web:
     build: .
-    command: gunicorn --bind 0.0.0.0:8000 --workers 3 config.wsgi:application
+    command: gunicorn --bind 0.0.0.0:8000 --workers 4 --threads 2 --timeout 300 --access-logfile - --error-logfile - config.wsgi:application
     volumes:
-      - .:/app
       - ./staticfiles:/app/staticfiles
       - ./media:/app/media
     expose:
       - "8000"
-    environment:
-      - DEBUG=True
-      - SECRET_KEY=your-secret-key-change-in-production
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/coffee_fortune_db
-      - REDIS_URL=redis://redis:6379/0
-      - CELERY_BROKER_URL=redis://redis:6379/1
-      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+    env_file:
+      - .env
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   celery:
     build: .
-    command: celery -A config worker -l info
+    command: celery -A config worker -l info --concurrency=4
     volumes:
-      - .:/app
-    environment:
-      - DEBUG=True
-      - SECRET_KEY=your-secret-key-change-in-production
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/coffee_fortune_db
-      - REDIS_URL=redis://redis:6379/0
-      - CELERY_BROKER_URL=redis://redis:6379/1
-      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - ./media:/app/media
+    env_file:
+      - .env
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
+    restart: unless-stopped
 
   celery-beat:
     build: .
     command: celery -A config beat -l info
-    volumes:
-      - .:/app
-    environment:
-      - DEBUG=True
-      - SECRET_KEY=your-secret-key-change-in-production
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/coffee_fortune_db
-      - REDIS_URL=redis://redis:6379/0
-      - CELERY_BROKER_URL=redis://redis:6379/1
-      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+    env_file:
+      - .env
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
+    restart: unless-stopped
 
   nginx:
     build:
       context: ./nginx
       dockerfile: Dockerfile
     ports:
-      - "80:80"
-      - "443:443"
+      - "8085:80"
     volumes:
-      - ./staticfiles:/app/staticfiles
-      - ./media:/app/media
-      # Uncomment for SSL certificates
-      # - ./certbot/conf:/etc/letsencrypt
-      # - ./certbot/www:/var/www/certbot
+      - ./staticfiles:/app/staticfiles:ro
+      - ./media:/app/media:ro
     depends_on:
       - web
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - default
 
 volumes:
   postgres_data:
+
+networks:
+  default:
+    driver: bridge
