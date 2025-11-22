@@ -101,7 +101,8 @@ def send_otp(request):
         {
             'message': 'OTP sent successfully',
             'phone_number': phone_number,
-            'expires_in': settings.OTP_EXPIRY_SECONDS
+            'expires_in': settings.OTP_EXPIRY_SECONDS,
+            'otp' : otp_code
         },
         status=status.HTTP_200_OK
     )
