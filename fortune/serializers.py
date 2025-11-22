@@ -25,11 +25,15 @@ class ReadingCreateSerializer(serializers.ModelSerializer):
     """
     Serializer for creating a new reading.
     """
-    feature_type = serializers.CharField(write_only=True)
+    feature_type = serializers.CharField(
+        write_only=True,
+        help_text='Type of fortune reading feature (e.g., coffee_fortune, tarot, dream_interpretation)'
+    )
     language = serializers.ChoiceField(
         choices=[('en', 'English'), ('fa', 'Persian')],
         default='en',
-        required=False
+        required=False,
+        help_text='Language for the reading response. Choose "en" for English or "fa" for Persian (Farsi). The AI will respond entirely in your selected language.'
     )
 
     class Meta:

@@ -18,6 +18,11 @@ Django REST Framework backend server for Coffee Fortune mobile application - A m
 - 🔮 **Tarot Reading**: Three-card spread with guidance (text)
 - 🔢 **Numerology**: Complete numerology profile (text)
 - ✋ **Palm Reading**: Palmistry analysis from hand photos (image)
+- 🦶 **Foot Reading**: Ancient practice of reading through foot characteristics (image)
+- 🤲 **Istikhara**: Spiritual guidance and divine consultation (text)
+- 📿 **Geomancy (Ramal)**: Mystical insights through ancient divination (text)
+
+**All features support bilingual responses in English and Persian (Farsi)**
 
 ### Technical Features
 - **Async Processing**: Celery workers for background task processing

@@ -95,9 +95,29 @@ class FortuneFeatureViewSet(viewsets.ReadOnlyModelViewSet):
     ),
     create=extend_schema(
         summary='Create a new reading',
-        description='Create a new fortune reading with an optional image. The reading will be processed asynchronously.',
+        description='Create a new fortune reading with an optional image. The reading will be processed asynchronously. You can specify the language parameter as "en" for English or "fa" for Persian responses.',
         request=ReadingCreateSerializer,
         responses={201: ReadingSerializer},
+        examples=[
+            OpenApiExample(
+                'English Coffee Reading Request',
+                value={
+                    'feature_type': 'coffee_fortune',
+                    'language': 'en',
+                    'image': '<binary image file>'
+                },
+                request_only=True,
+            ),
+            OpenApiExample(
+                'Persian Dream Interpretation Request',
+                value={
+                    'feature_type': 'dream_interpretation',
+                    'language': 'fa',
+                    'text_input': 'دیشب خواب دیدم که پرواز می‌کنم'
+                },
+                request_only=True,
+            ),
+        ],
         tags=['Readings']
     ),
     update=extend_schema(
